@@ -103,7 +103,6 @@ if __name__ == "__main__":
             cv2.rectangle(someimg, (rect[0], rect[1]), (rect[2], rect[3]), (0, 255, 255), 2) 
             cv2.putText(someimg, str(obj.newid), (rect[0], rect[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255)) 
         cv2.imshow('testimage', someimg)
-            
         if cv2.waitKey(0) & 0xFF == ord('q'):
             break
  
