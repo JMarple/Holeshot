@@ -4,6 +4,7 @@ import time
 import trackObjects
 import findblobs
 import coneCalculations
+import averaging
 
 class jetsonRobot:
     
@@ -49,7 +50,7 @@ if __name__ == "__main__":
 
     j.waitForButton()
 
-    turnPID = coneCalculations.jetsonPID(0.05, 0, 0)
+    turnPID = coneCalculations.jetsonPID(0.06, 0, 0.0)
 
     #j.ser.write("t38!")
     t = trackObjects.trackObjects()
@@ -76,13 +77,20 @@ if __name__ == "__main__":
    
         height, width = labImage.shape[:2]
 
-        error = targetPos[0] - width/2
-        turnPID.kP = targetHeight*0.0005 + 0.01 
+        #error = targetPos[0] - width/2
+        error, weightsum = averaging.getOrangeError(labImage)
+        print "WEIGHTSUM = " + str(weightsum)
+        turnPID.kP = -weightsum*0.00004 + 0.06
+        if turnPID.kP < 0:
+            turnPID.kp = 0
+
         turnFeedback = int(turnPID.update(error, 1))
         if (turnFeedback > 50): turnFeedback = 50
         if (turnFeedback < -50): turnFeedback = -50
 
         turnFeedback += 50  
+
+        print "FEEDBACK = " + str(turnFeedback)
 
         j.ser.write("s" + str(turnFeedback) + "!")
         j.ser.write("t32!")
