@@ -2,10 +2,26 @@ import trackObjects
 import findblobs
 import cv2
 
+class jetsonPID:
+    def __init__(self, kP, kI, kD):
+        self.kP = kP
+        self.kI = kI
+        self.kD = kD
+        self.integral = 0
+        self.previousError = 0
+
+    # Simple update loop, assumes constant dT
+    def update(self, error):
+        self.integral += error
+        self.derivative = error - self.previousError
+        self.previousError = error
+
+        return self.kP * error + self.kI * self.integral + self.kD * self.derivative
+
 def getTargetPosition(objects):
 
-    if len(objects) < 2: return (-1, -1)
-
+    if len(objects) < 1: return (-1, -1)
+    if len(objects) < 2: return objects[0].getCenter()
     x = 0
     y = 0
 
