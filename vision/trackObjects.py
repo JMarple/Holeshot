@@ -82,10 +82,6 @@ class trackObjects:
 
 if __name__ == "__main__":
 
-    objects = [[100, 100, 200, 200], [300, 300, 350, 350]]
-
-    objectsNew = [[150, 150, 225, 225], [250, 250, 350, 350]]
-
     t = trackObjects()
        
     cap = cv2.VideoCapture("../testing/testvideo3.avi") 
