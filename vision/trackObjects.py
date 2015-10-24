@@ -63,8 +63,9 @@ class trackObjects:
 
             # Update connected objects from old frame to new frame
             if lowestDistance < 8000:
-                obj.applyNewObject(newobjects[lowestDistanceIndex])
-                newobjects.remove(newobjects[lowestDistanceIndex])   
+                closestObject = newobjects[lowestDistanceIndex]
+                obj.applyNewObject(closestObject)
+                newobjects.remove(closestObject)
 
             # Remove Untracked Objects
             else:

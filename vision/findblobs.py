@@ -15,7 +15,10 @@ def findBlobs(labImage, DEBUG):
     output = cv2.bitwise_and(labImage, labImage, mask = mask)
 
     # Blur by alot so that alot of noise is cut out
-    blurredOutput = cv2.blur(output, (25, 25))
+    # blurredOutput = cv2.blur(output, (25, 25))
+    kernel = np.ones((5, 5), np.uint8) 
+    dilation = cv2.dilate(output, kernel, iterations=4) 
+    blurredOutput = cv2.blur(dilation, (5, 5))
 
     # Create binary image
     ret, thresh1 = cv2.threshold(blurredOutput, 1, 255, cv2.THRESH_BINARY)
@@ -67,7 +70,7 @@ def findBlobs(labImage, DEBUG):
     CUTOFF_HEIGHT = 300 # Anything above this height (0 to 300) should not be considered a potentional object
 
     cv2.rectangle(labImage, (0, CUTOFF_HEIGHT), (width, CUTOFF_HEIGHT), (255, 255, 0), 1)
-
+    cv2.rectangle(labImage, (width/2, 0), (width/2, height), (255, 255, 0), 1)
     # Find core objects in picture.  If multiple rectangles overlap, combine them.
     for obj in objs:
         if obj[0] != 0: continue
