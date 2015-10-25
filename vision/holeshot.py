@@ -18,6 +18,10 @@ class jetsonRobot:
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS)
 
+        print "IS OPEN---"
+        print self.ser.isOpen()
+        
+        #self.ser.write('s100!')
         # The robot should be connected now
         #self.ser.write('t50!')
 
@@ -41,20 +45,24 @@ if __name__ == "__main__":
     j = jetsonRobot()   
     j.connect()
 
+    time.sleep(1)
+
     j.waitForButton()
-    
+
     turnPID = coneCalculations.jetsonPID(0.05, 0, 0)
 
+    #j.ser.write("t38!")
     t = trackObjects.trackObjects()
     
     cap = cv2.VideoCapture(0)   
-    video = cv2.VideoWriter("video.avi", cv2.cv.CV_FOURCC('M', 'J', 'P', 'G'), 25, (640, 480))
 
-    j.ser.write("t38!")
+    ret, frame = cap.read()
+
+    cv2.imwrite('testimage.jpg', frame)    
 
     while (cap.isOpened()):
-        
-        j.ser.write("t38!")
+ 
+        #j.ser.write("t38!")
 
         ret, frame = cap.read()
 
@@ -64,21 +72,22 @@ if __name__ == "__main__":
 
         t.update(objects)
 
-        targetPos = coneCalculations.getTargetPosition(t.getObjects())
-    
+        targetPos, targetHeight = coneCalculations.getTargetPosition(t.getObjects())
+   
         height, width = labImage.shape[:2]
 
         error = targetPos[0] - width/2
-    
-        turnFeedback = int(turnPID.update(error))
+        turnPID.kP = targetHeight*0.0005 + 0.01 
+        turnFeedback = int(turnPID.update(error, 1))
         if (turnFeedback > 50): turnFeedback = 50
         if (turnFeedback < -50): turnFeedback = -50
 
         turnFeedback += 50  
 
         j.ser.write("s" + str(turnFeedback) + "!")
-    
-        print "Error = " + str(error)
+        j.ser.write("t32!")
+        j.ser.flush()
+         
         cv2.line(someimg, (width/2, height), targetPos, (255, 0, 255), 2)
 
         for obj in t.getObjects():
@@ -92,5 +101,4 @@ if __name__ == "__main__":
             break
 
     cap.release()   
-    video.release()
     j.closeSerial()

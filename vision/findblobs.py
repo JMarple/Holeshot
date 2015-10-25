@@ -111,17 +111,16 @@ def findBlobs(labImage, DEBUG):
 # Debugging 
 if __name__ == "__main__":
     
-    cap = cv2.VideoCapture("../testing/testvideo3.avi")
+    #cap = cv2.VideoCapture("../testing/testvideo3.avi")
 
-    while (cap.isOpened()):
-        ret, frame = cap.read()
-        
-        labImage = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
+    #while (cap.isOpened()):
+    frame = cv2.imread('../testing/testimage2.jpg') #cap.read()
+    
+    labImage = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
-        x, someimg = findBlobs(labImage, True)
-        cv2.imshow('testimage', someimg)
+    x, someimg = findBlobs(labImage, True)
+    cv2.imshow('testimage', someimg)
 
-        if cv2.waitKey(0) & 0xFF == ord('q'):
-            break
-            
-    cap.release() 
+    cv2.waitKey(0)
+
+    #cap.release() 

@@ -11,27 +11,30 @@ class jetsonPID:
         self.previousError = 0
 
     # Simple update loop, assumes constant dT
-    def update(self, error):
+    def update(self, error, scale):
         self.integral += error
         self.derivative = error - self.previousError
         self.previousError = error
 
-        return self.kP * error + self.kI * self.integral + self.kD * self.derivative
+        return self.kP * error / scale + self.kI * self.integral / scale  + self.kD * self.derivative / scale
 
 def getTargetPosition(objects):
 
-    if len(objects) < 1: return (-1, -1)
-    if len(objects) < 2: return objects[0].getCenter()
+    if len(objects) < 1: return (-1, -1), -1
+    if len(objects) < 2: return objects[0].getCenter(), abs(objects[0].getRect()[3] - objects[0].getRect()[1])
     x = 0
     y = 0
+    height = 0
 
     # Get two largest objects
     for i in range(0, 2):
         center = objects[i].getCenter()
+        height += abs(objects[i].getRect()[3] - objects[i].getRect()[1])
+
         x += center[0]
         y += center[1]
    
-    return (x/2, y/2) 
+    return (x/2, y/2),  height/2
 
 if __name__ == "__main__":
     t = trackObjects.trackObjects()
