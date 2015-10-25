@@ -20,7 +20,7 @@ cv2.createTrackbar('Bl', 'testimage', 0, 255, updateImage)
 
 im = cv2.imread("test.jpg")
 
-labImage = cv2.cvtColor(im, cv2.COLOR_BGR2LAB);
+labImage = cv2.cvtColor(im, cv2.COLOR_BGR2HSV);
 
 mask = cv2.inRange(labImage, low, high)
 output = cv2.bitwise_and(labImage, labImage, mask = mask)
@@ -29,7 +29,7 @@ cv2.setTrackbarPos('Lh', 'testimage', 255)
 cv2.setTrackbarPos('Ah', 'testimage', 255)
 cv2.setTrackbarPos('Bh', 'testimage', 255)
 
-cap = cv2.VideoCapture('testvideo4.avi')
+cap = cv2.VideoCapture('changingLights.avi')
 ret, frame = cap.read()
 labImage = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
