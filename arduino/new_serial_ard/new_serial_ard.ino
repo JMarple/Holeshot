@@ -57,6 +57,8 @@ void setup()
   pinMode(RGB2_PING, OUTPUT);
   pinMode(RGB2_PINB, OUTPUT);
 
+  pinMode(A1, INPUT);
+
   digitalWrite(RGB1_PINR, LOW);
   digitalWrite(RGB1_PINB, LOW);
   digitalWrite(RGB1_PING, LOW);
@@ -74,21 +76,34 @@ void setup()
 
 void get_serial_command()
 {
-	temp_str = "";
 	for (int i = 0; i < 100; i++)
 	{
 		if (Serial.available() > 0)
 		{            
+
+            
 	        char b = Serial.read();
+
+          if (b == '3')
+          {
+            digitalWrite(RGB2_PINR, HIGH);
+            digitalWrite(RGB2_PINB, HIGH);
+            digitalWrite(RGB2_PING, HIGH);
+          }
+	        
 	        if (b != '!')
 	        {
+           
 	            temp_str += b;
 	        }
+          
 	        else if (b == '!')
 	        {
+         
 	            crt_code = temp_str[0];
 	            temp_str[0] = '0';
 	            crt_value = stringToNumber(temp_str);
+              temp_str = "";
 	            return;
 	        }
 	    }
@@ -104,6 +119,8 @@ double normalize_serial_input(int in)
   return normalized;
 }
 
+int debounce = 0;
+
 void loop() 
 {
   int batteryValue = analogRead(A5);
@@ -112,8 +129,41 @@ void loop()
     robotMode = 99;
   
   // This is autodrive mode
-  if (robotMode == 0)
+  if (robotMode == -1)
   {
+    int buttonState = digitalRead(A1);
+
+    if (buttonState == HIGH) {
+      digitalWrite(RGB2_PINB, HIGH);
+    }
+    else
+    {
+      digitalWrite(RGB2_PINB, LOW);
+      Serial.write("g!");
+      robotMode = 0;
+    }
+
+    if ((throtPwmValue < 1700 && throtPwmValue > 1600) || (throtPwmValue < 1400 && throtPwmValue > 1300))
+      robotMode = 1;
+  }
+  else if (robotMode == 0)
+  {
+    digitalWrite(RGB2_PINR, LOW);
+        digitalWrite(RGB2_PINB, LOW);
+        digitalWrite(RGB2_PING, LOW);
+
+       int buttonState = digitalRead(A1);
+
+    if (buttonState == HIGH) {
+      digitalWrite(RGB2_PINB, HIGH);
+    }
+    else
+    {
+      digitalWrite(RGB2_PINB, LOW);
+      Serial.write("g!");
+      robotMode = 0;
+    }
+    
     double num = 4.0;
     get_serial_command();
     switch (crt_code)
@@ -128,6 +178,10 @@ void loop()
     	case THROTTLE_FLAG:
     		heartbeat_cnt = 0;
     		__setPWM(MOTOR_PIN, normalize_serial_input(crt_value));
+        digitalWrite(RGB2_PINR, HIGH);
+        digitalWrite(RGB2_PINB, HIGH);
+        digitalWrite(RGB2_PING, HIGH);
+        delay(10);
     		break;
     	case STEERING_FLAG:
     		heartbeat_cnt = 0;
